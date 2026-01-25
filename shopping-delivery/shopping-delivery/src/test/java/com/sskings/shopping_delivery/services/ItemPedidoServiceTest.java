@@ -1,5 +1,8 @@
 package com.sskings.shopping_delivery.services;
 
+import com.sskings.shopping_delivery.exceptions.ItemNaoEncontradoException;
+import com.sskings.shopping_delivery.exceptions.ItemPedidoNaoEncontradoException;
+import com.sskings.shopping_delivery.exceptions.PedidoNaoEncontradoException;
 import com.sskings.shopping_delivery.models.*;
 import com.sskings.shopping_delivery.repositories.ItemPedidoRepository;
 import com.sskings.shopping_delivery.repositories.ItemRepository;
@@ -32,6 +35,9 @@ public class ItemPedidoServiceTest {
 
     @Mock
     private ItemPedidoRepository itemPedidoRepository;
+
+    @Mock
+    private PedidoService pedidoService;
 
     @InjectMocks
     private ItemPedidoService itemPedidoService;
@@ -79,9 +85,12 @@ public class ItemPedidoServiceTest {
     @Test
     void deveSalvarUmItemPedidoComSucesso() {
         // Given / Arrange
+        itemPedidoModel.setPrecoUnitario(BigDecimal.valueOf(40));
         when(itemRepository.findById(1L)).thenReturn(Optional.of(itemPedidoModel.getItem()));
         when(pedidoRepository.findById(1L)).thenReturn(Optional.of(itemPedidoModel.getPedido()));
+        when(itemRepository.save(any(ItemModel.class))).thenReturn(itemPedidoModel.getItem());
         when(itemPedidoRepository.save(itemPedidoModel)).thenReturn(itemPedidoModel);
+        willDoNothing().given(pedidoService).calcularTotalPedido(1L);
         // When / Act
         ItemPedidoModel itemPedidoRetornado = itemPedidoService.salvar(itemPedidoModel);
         // Then / Assert
@@ -97,7 +106,7 @@ public class ItemPedidoServiceTest {
         // Given / Arrange
         when(itemRepository.findById(1L)).thenReturn(Optional.empty());
         // When / Act
-        Exception exception = assertThrows(RuntimeException.class, () -> itemPedidoService.salvar(itemPedidoModel));
+        Exception exception = assertThrows(ItemNaoEncontradoException.class, () -> itemPedidoService.salvar(itemPedidoModel));
         // Then / Assert
         assertNotNull(exception);
         assertEquals("Item não encontrado.", exception.getMessage());
@@ -112,7 +121,7 @@ public class ItemPedidoServiceTest {
         when(itemRepository.findById(1L)).thenReturn(Optional.of(itemPedidoModel.getItem()));
         when(pedidoRepository.findById(1L)).thenReturn(Optional.empty());
         // When / Act
-        Exception exception = assertThrows(RuntimeException.class, () -> itemPedidoService.salvar(itemPedidoModel));
+        Exception exception = assertThrows(PedidoNaoEncontradoException.class, () -> itemPedidoService.salvar(itemPedidoModel));
         // Then / Assert
         assertNotNull(exception);
         assertEquals("Pedido não encontrado.", exception.getMessage());
@@ -173,10 +182,10 @@ public class ItemPedidoServiceTest {
         // Given / Arrange
         when(itemPedidoRepository.findById(1L)).thenReturn(Optional.empty());
         // When / Act
-        Exception exception = assertThrows(RuntimeException.class, () -> itemPedidoService.buscarItemPedidoPorId(1L));
+        Exception exception = assertThrows(ItemPedidoNaoEncontradoException.class, () -> itemPedidoService.buscarItemPedidoPorId(1L));
         // Then / Assert
         assertNotNull(exception);
-        assertEquals("registro não encontrado", exception.getMessage());
+        assertEquals("Item do pedido não encontrado.", exception.getMessage());
         verify(itemPedidoRepository, times(1)).findById(1L);
     }
 
@@ -185,12 +194,16 @@ public class ItemPedidoServiceTest {
     void deveRemoverUmItemPedidoPorIdComSucesso() {
         // Given / Arrange
         when(itemPedidoRepository.findById(1L)).thenReturn(Optional.of(itemPedidoModel));
+        when(itemRepository.save(any(ItemModel.class))).thenReturn(itemPedidoModel.getItem());
         willDoNothing().given(itemPedidoRepository).deleteById(1L);
+        willDoNothing().given(pedidoService).calcularTotalPedido(1L);
         // When / Act
         itemPedidoService.removerPorId(1L);
         // Then / Assert
         verify(itemPedidoRepository, times(1)).findById(1L);
+        verify(itemRepository, times(1)).save(any(ItemModel.class));
         verify(itemPedidoRepository, times(1)).deleteById(1L);
+        verify(pedidoService, times(1)).calcularTotalPedido(1L);
     }
 
     @DisplayName("Deve Lançar Uma Exceção Quando Remover Por ID Item Pedido Não Encontrado")
@@ -199,10 +212,10 @@ public class ItemPedidoServiceTest {
         // Given / Arrange
         when(itemPedidoRepository.findById(1L)).thenReturn(Optional.empty());
         // When / Act
-        Exception exception = assertThrows(RuntimeException.class, () -> { itemPedidoService.removerPorId(1L); });
+        Exception exception = assertThrows(ItemPedidoNaoEncontradoException.class, () -> { itemPedidoService.removerPorId(1L); });
         // Then / Assert
         assertNotNull(exception);
-        assertEquals("Item Pedido não encontrado.", exception.getMessage());
+        assertEquals("Item do pedido não encontrado.", exception.getMessage());
         verify(itemPedidoRepository, times(1)).findById(1L);
         verify(itemPedidoRepository, never()).deleteById(1L);
     }

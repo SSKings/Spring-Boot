@@ -66,32 +66,98 @@ This repository contains **6 independent Spring Boot projects**, each demonstrat
 
 **Location:** `shopping-delivery/shopping-delivery/`
 
-**Description:** E-commerce delivery API for managing customers, products, orders, and deliveries.
+**Description:** Complete e-commerce delivery API for managing customers, products, orders, and deliveries with full CRUD operations, inventory management, and automatic calculations.
 
 **Key Features:**
-- Customer management with CPF and email validation
-- Address management (multiple addresses per customer)
-- Product/item catalog with inventory
-- Order management with status tracking
-- Order items with automatic subtotal calculations
+- **Customer Management** - Full CRUD with CPF and email uniqueness validation
+- **Address Management** - Multiple addresses per customer with validation
+- **Product/Item Catalog** - Complete inventory management with stock tracking
+- **Order Management** - Full order lifecycle with status tracking
+- **Order Items** - Automatic subtotal and total calculations
+- **Stock Validation** - Prevents sales when inventory is insufficient
+- **Automatic Calculations** - Order totals calculated automatically based on items
+- **Status Management** - Dedicated endpoint for updating order status
+- **Comprehensive Validation** - Bean validation on all entities
+- **Exception Handling** - Custom exceptions with proper HTTP status codes
 
 **Technology Stack:**
 - Java 17
 - Spring Boot 3.3.7
 - Spring Data JPA
+- Spring Validation
 - Flyway (database migrations)
 - H2 Database
 - OpenAPI/Swagger
 
 **Main Components:**
-- Controllers: Cliente, Endereco
-- Models: Cliente, Endereco, Item, Pedido, ItemPedido, StatusPedido (enum)
-- Services: ClienteService, EnderecoService, ItemService, PedidoService, ItemPedidoService
-- Database schema with foreign key relationships
+- **Controllers:**
+  - `ClienteController` - Customer CRUD operations
+  - `EnderecoController` - Address CRUD operations
+  - `ItemController` - Product/item CRUD operations
+  - `PedidoController` - Order CRUD + status update
+  - `ItemPedidoController` - Order items management
+- **Models:**
+  - `ClienteModel` - Customer entity with validation
+  - `EnderecoModel` - Address entity
+  - `ItemModel` - Product/item entity with inventory
+  - `PedidoModel` - Order entity with status and total
+  - `ItemPedidoModel` - Order item with automatic subtotal calculation
+  - `StatusPedido` - Enum (PENDENTE, APROVADO, ENTREGUE, CANCELADO)
+- **Services:**
+  - `ClienteService` - Business logic for customers
+  - `EnderecoService` - Address management
+  - `ItemService` - Product/inventory management
+  - `PedidoService` - Order management with automatic total calculation
+  - `ItemPedidoService` - Order items with stock validation
+- **Exceptions:**
+  - `ClienteNaoEncontradoException`
+  - `EnderecoNaoEncontradoException`
+  - `ItemNaoEncontradoException`
+  - `PedidoNaoEncontradoException`
+  - `ItemPedidoNaoEncontradoException`
+  - `EstoqueInsuficienteException`
+  - `EmailExistenteException`
+  - `CpfExistenteException`
+- **Exception Handler:** `ApiExceptionHandler` - Centralized exception handling
+
+**API Endpoints:**
+- `POST /clientes` - Create customer
+- `GET /clientes` - List all customers
+- `GET /clientes/{id}` - Get customer by ID
+- `PUT /clientes/{id}` - Update customer
+- `DELETE /clientes/{id}` - Delete customer
+- `POST /enderecos` - Create address
+- `GET /enderecos` - List all addresses
+- `GET /enderecos/{id}` - Get address by ID
+- `PUT /enderecos/{id}` - Update address
+- `DELETE /enderecos/{id}` - Delete address
+- `POST /itens` - Create product/item
+- `GET /itens` - List all items
+- `GET /itens/{id}` - Get item by ID
+- `PUT /itens/{id}` - Update item
+- `DELETE /itens/{id}` - Delete item
+- `POST /pedidos` - Create order
+- `GET /pedidos` - List all orders
+- `GET /pedidos/{id}` - Get order by ID
+- `PUT /pedidos/{id}` - Update order
+- `PATCH /pedidos/{id}/status` - Update order status
+- `DELETE /pedidos/{id}` - Delete order
+- `POST /itens-pedido` - Add item to order
+- `GET /itens-pedido` - List all order items
+- `GET /itens-pedido/{id}` - Get order item by ID
+- `DELETE /itens-pedido/{id}` - Remove item from order
 
 **Order Status Flow:**
-- PENDENTE → APROVADO → ENTREGUE
-- CANCELADO (at any stage)
+- `PENDENTE` → `APROVADO` → `ENTREGUE`
+- `CANCELADO` (can be set at any stage)
+
+**Business Rules:**
+- Email and CPF must be unique per customer
+- Stock is validated before adding items to orders
+- Stock is automatically decremented when items are added to orders
+- Stock is restored when items are removed from orders
+- Order totals are calculated automatically based on item quantities and prices
+- Order status can be updated independently via dedicated endpoint
 
 ---
 

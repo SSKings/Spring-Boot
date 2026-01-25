@@ -82,7 +82,7 @@ public class EnderecoControllerTest {
 
         // Then / Assert
         response
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andDo(print())
                 .andExpect(jsonPath("$.logradouro").value("Rua Test"))
                 .andExpect(jsonPath("$.cliente.nome").value("Cliente Teste"));
@@ -246,10 +246,10 @@ public class EnderecoControllerTest {
     @Test
     void dadoEnderecoIdInvalidoQuandoRemoverPorIdDeveLancarExcecao() throws Exception {
         // Given / Arrange
-        given(enderecoService.buscarPorId(anyLong())).willThrow(ClienteNaoEncontradoException.class);
+        willThrow(EnderecoNaoEncontradoException.class).given(enderecoService).removerPorId(anyLong());
 
         // When / Act
-        ResultActions response = mockMvc.perform(delete("/enderecos/{id}", anyLong()));
+        ResultActions response = mockMvc.perform(delete("/enderecos/{id}", 1L));
         // Then / Assert
         response
                 .andExpect(status().isNotFound())

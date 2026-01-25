@@ -68,7 +68,7 @@ public class ClienteControllerTest {
         // Then / Assert
 
         response.andDo(print())
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.nome").value(clienteModel.getNome()))
                 .andExpect(jsonPath("$.email").value(clienteModel.getEmail()));
 
@@ -199,7 +199,7 @@ public class ClienteControllerTest {
     @Test
     void dadoClienteIdInvalidoQuandoRemoverClienteDeveLancarExcecao() throws Exception {
         // Given / Arrange
-        given(clienteService.buscarPorId(1L)).willThrow(ClienteNaoEncontradoException.class);
+        willThrow(ClienteNaoEncontradoException.class).given(clienteService).removerPorId(1L);
 
         ResultActions response = mockMvc.perform(delete("/clientes/{id}", 1L));
         // Then / Assert
