@@ -1,6 +1,8 @@
 package com.sskings.shopping_delivery.models;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -18,14 +20,18 @@ public class ItemPedidoModel {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
+    @NotNull(message = "Pedido é obrigatório")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "pedido_id", nullable = false)
     private PedidoModel pedido;
 
+    @NotNull(message = "Item é obrigatório")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "item_id", nullable = false)
     private ItemModel item;
 
+    @NotNull(message = "Quantidade é obrigatória")
+    @Min(value = 1, message = "Quantidade deve ser maior que zero")
     @Column(nullable = false)
     private Long quantidade;
 
@@ -38,6 +44,8 @@ public class ItemPedidoModel {
     @PrePersist
     @PreUpdate
     public void calcularSubtotal(){
-        this.subtotal = this.precoUnitario.multiply(BigDecimal.valueOf(this.quantidade));
+        if (precoUnitario != null && quantidade != null) {
+            this.subtotal = this.precoUnitario.multiply(BigDecimal.valueOf(this.quantidade));
+        }
     }
 }

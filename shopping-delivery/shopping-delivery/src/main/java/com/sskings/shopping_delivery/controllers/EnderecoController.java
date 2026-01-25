@@ -2,7 +2,9 @@ package com.sskings.shopping_delivery.controllers;
 
 import com.sskings.shopping_delivery.models.EnderecoModel;
 import com.sskings.shopping_delivery.services.EnderecoService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,8 +18,8 @@ public class EnderecoController {
     private final EnderecoService enderecoService;
 
     @PostMapping
-    public ResponseEntity<EnderecoModel> salvarEndereco(@RequestBody EnderecoModel enderecoModel) {
-        return ResponseEntity.ok(enderecoService.salvar(enderecoModel));
+    public ResponseEntity<EnderecoModel> salvarEndereco(@Valid @RequestBody EnderecoModel enderecoModel) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(enderecoService.salvar(enderecoModel));
     }
 
     @GetMapping
@@ -32,14 +34,14 @@ public class EnderecoController {
 
     @PutMapping("/{id}")
     public ResponseEntity<EnderecoModel> atualizarEndereco(@PathVariable Long id,
-                                                           @RequestBody EnderecoModel enderecoModel) {
+                                                           @Valid @RequestBody EnderecoModel enderecoModel) {
         EnderecoModel enderecoAtualizado = enderecoService.atualizar(id, enderecoModel);
         return ResponseEntity.ok(enderecoAtualizado);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletarEndereco(@PathVariable Long id) {
-        buscarPorId(id);
+        enderecoService.removerPorId(id);
         return ResponseEntity.noContent().build();        
     }
 }

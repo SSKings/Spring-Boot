@@ -1,6 +1,7 @@
 package com.sskings.shopping_delivery.models;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -20,10 +21,12 @@ public class PedidoModel {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
+    @NotNull(message = "Cliente é obrigatório")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cliente_id", nullable = false)
     private ClienteModel cliente;
 
+    @NotNull(message = "Endereço de entrega é obrigatório")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "endereco_entrega_id", nullable = false)
     private EnderecoModel endereco;
@@ -42,4 +45,16 @@ public class PedidoModel {
     @OneToMany(mappedBy = "pedido",cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<ItemPedidoModel> itens;
 
+    @PrePersist
+    protected void onCreate() {
+        if (dataPedido == null) {
+            dataPedido = LocalDateTime.now();
+        }
+        if (status == null) {
+            status = StatusPedido.PENDENTE;
+        }
+        if (total == null) {
+            total = BigDecimal.ZERO;
+        }
+    }
 }

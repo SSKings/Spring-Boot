@@ -1,5 +1,6 @@
 package com.sskings.shopping_delivery.services;
 
+import com.sskings.shopping_delivery.exceptions.ItemNaoEncontradoException;
 import com.sskings.shopping_delivery.models.ItemModel;
 import com.sskings.shopping_delivery.repositories.ItemRepository;
 import jakarta.transaction.Transactional;
@@ -30,21 +31,19 @@ public class ItemService {
 
     public ItemModel buscarPorId(Long id) {
         return itemRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Item não encontrado."));
+                .orElseThrow(() -> new ItemNaoEncontradoException("Item não encontrado."));
     }
 
     @Transactional
     public ItemModel atualizar(Long id, ItemModel itemModel) {
-        itemRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Item não encontrado."));
+        buscarPorId(id);
         itemModel.setId(id);
         return itemRepository.save(itemModel);
     }
 
     @Transactional
     public void removerPorId(Long id) {
-        itemRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Item não encontrado."));
+        buscarPorId(id);
         itemRepository.deleteById(id);
     }
 }

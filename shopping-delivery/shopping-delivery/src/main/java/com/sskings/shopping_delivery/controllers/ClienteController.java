@@ -2,6 +2,7 @@ package com.sskings.shopping_delivery.controllers;
 
 import com.sskings.shopping_delivery.models.ClienteModel;
 import com.sskings.shopping_delivery.services.ClienteService;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,8 +18,8 @@ public class ClienteController {
     private ClienteService clienteService;
 
     @PostMapping
-    public ResponseEntity<ClienteModel> salvarCliente(@RequestBody ClienteModel cliente) {
-        return ResponseEntity.status(HttpStatus.OK).body(clienteService.salvar(cliente));
+    public ResponseEntity<ClienteModel> salvarCliente(@Valid @RequestBody ClienteModel cliente) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(clienteService.salvar(cliente));
     }
 
     @GetMapping
@@ -33,14 +34,15 @@ public class ClienteController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ClienteModel> atualizarCliente(@PathVariable long id, @RequestBody ClienteModel cliente) {
+    public ResponseEntity<ClienteModel> atualizarCliente(@PathVariable long id, 
+                                                          @Valid @RequestBody ClienteModel cliente) {
         ClienteModel clienteAtualido = clienteService.atualizar(id, cliente);
         return ResponseEntity.ok(clienteAtualido);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> removerCliente(@PathVariable long id) {
-        clienteService.buscarPorId(id);
+        clienteService.removerPorId(id);
         return ResponseEntity.noContent().build();
     }
 }

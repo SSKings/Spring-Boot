@@ -21,7 +21,8 @@ public class EnderecoService {
 
     @Transactional
     public EnderecoModel salvar(EnderecoModel enderecoModel){
-        clienteRepository.findById(enderecoModel.getCliente().getId());
+        clienteRepository.findById(enderecoModel.getCliente().getId())
+                .orElseThrow(() -> new ClienteNaoEncontradoException("Cliente não encontrado."));
         return enderecoRepository.save(enderecoModel);
     }
 

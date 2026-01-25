@@ -78,4 +78,44 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
         return apiErrors;
     }
 
+    @ExceptionHandler(ItemNaoEncontradoException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ApiErrors handleItemNaoEncontradoException(ItemNaoEncontradoException ex){
+        ApiErrors apiErrors = new ApiErrors();
+        apiErrors.setMessage(ex.getMessage());
+        apiErrors.setStatusCode(HttpStatus.NOT_FOUND.value());
+        apiErrors.setTimestamp(LocalDateTime.now());
+        return apiErrors;
+    }
+
+    @ExceptionHandler(PedidoNaoEncontradoException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ApiErrors handlePedidoNaoEncontradoException(PedidoNaoEncontradoException ex){
+        ApiErrors apiErrors = new ApiErrors();
+        apiErrors.setMessage(ex.getMessage());
+        apiErrors.setStatusCode(HttpStatus.NOT_FOUND.value());
+        apiErrors.setTimestamp(LocalDateTime.now());
+        return apiErrors;
+    }
+
+    @ExceptionHandler(ItemPedidoNaoEncontradoException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ApiErrors handleItemPedidoNaoEncontradoException(ItemPedidoNaoEncontradoException ex){
+        ApiErrors apiErrors = new ApiErrors();
+        apiErrors.setMessage(ex.getMessage());
+        apiErrors.setStatusCode(HttpStatus.NOT_FOUND.value());
+        apiErrors.setTimestamp(LocalDateTime.now());
+        return apiErrors;
+    }
+
+    @ExceptionHandler(EstoqueInsuficienteException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ApiErrors handleEstoqueInsuficienteException(EstoqueInsuficienteException ex){
+        ApiErrors apiErrors = new ApiErrors();
+        apiErrors.setMessage(ex.getMessage());
+        apiErrors.setStatusCode(HttpStatus.BAD_REQUEST.value());
+        apiErrors.setTimestamp(LocalDateTime.now());
+        return apiErrors;
+    }
+
 }
